@@ -344,6 +344,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .shabbat-times tr:last-child td { border-bottom: none; }
 .shabbat-times td[dir='ltr'] { font-variant-numeric: tabular-nums; font-weight: 600; text-align: start; }
 .shabbat-times td:first-child { color: var(--muted); }
+.shabbat-times .rt-time { color: var(--muted); font-weight: 500; }
 
 details { margin-bottom: 10px; }
 details > summary {

@@ -21,16 +21,18 @@ function ShabbatTimesCard({ now }: { now: Date }) {
       <Card className="shabbat-times">
         <table>
           <thead>
-            <tr><th></th><th>כניסה</th><th>יציאה</th></tr>
+            <tr><th></th><th>כניסה</th><th>יציאה</th><th>רבנו תם</th></tr>
           </thead>
           <tbody>
             {SHABBAT_CITIES.map((id) => {
               const c = findCity(id);
+              const zSat = dayZmanim(sat, c);
               return (
                 <tr key={id}>
                   <td>{c.name}</td>
                   <td dir="ltr">{fmtTime(candleLighting(fri, c))}</td>
-                  <td dir="ltr">{fmtTime(dayZmanim(sat, c).tzeit)}</td>
+                  <td dir="ltr">{fmtTime(zSat.tzeit)}</td>
+                  <td dir="ltr" className="rt-time">{fmtTime(zSat.tzeitRT)}</td>
                 </tr>
               );
             })}
@@ -38,6 +40,7 @@ function ShabbatTimesCard({ now }: { now: Date }) {
         </table>
         <p className="muted small">
           כניסה — הדלקת נרות (ירושלים 40 דק׳ לפני השקיעה, חיפה 30, השאר 20) · יציאה — צאת הכוכבים
+          · רבנו תם — 72 דק׳ אחרי השקיעה, למי שנוהג בשיטה זו
         </p>
       </Card>
     </>

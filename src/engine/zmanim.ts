@@ -21,6 +21,7 @@ export function dayZmanim(date: Date, city: City): DayZmanim {
   if (cached) return cached;
   // useElevation=false — הזמנים המקובלים בלוחות בישראל מחושבים לגובה פני הים
   const z = new Zmanim(geo(city), date, false);
+  const sunset = z.sunset();
   const result: DayZmanim = {
     alot: z.alotHaShachar(),
     misheyakir: z.misheyakir(),
@@ -31,8 +32,9 @@ export function dayZmanim(date: Date, city: City): DayZmanim {
     minchaGedola: z.minchaGedola(),
     minchaKetana: z.minchaKetana(),
     plag: z.plagHaMincha(),
-    sunset: z.sunset(),
+    sunset,
     tzeit: z.tzeit(8.5),
+    tzeitRT: new Date(sunset.getTime() + 72 * 60_000),
     chatzotNight: z.chatzotNight(),
   };
   if (zCache.size > 400) zCache.clear();

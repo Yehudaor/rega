@@ -84,6 +84,7 @@ export function DayView({ iso, city }: { iso: string; city: City }) {
           <div><span>פלג המנחה</span><b dir="ltr">{fmtTime(d.zmanim.plag)}</b></div>
           <div><span>שקיעה</span><b dir="ltr">{fmtTime(d.zmanim.sunset)}</b></div>
           <div><span>צאת הכוכבים</span><b dir="ltr">{fmtTime(d.zmanim.tzeit)}</b></div>
+          <div><span>צאת הכוכבים — רבנו תם</span><b dir="ltr">{fmtTime(d.zmanim.tzeitRT)}</b></div>
         </div>
         <p className="muted small">זמני צאת הכוכבים לפי 8.5 מעלות מתחת לאופק — השיטה הנפוצה בלוחות בישראל.</p>
       </Card>

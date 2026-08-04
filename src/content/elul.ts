@@ -42,6 +42,7 @@ export const elul: EventContent = {
   sources: [
     { label: 'טור', ref: 'אורח חיים, סימן תקפ״א' },
     { label: 'משנה ברורה', ref: 'סימן תקפ״א' },
+    { label: 'פניני הלכה', ref: 'ימים נוראים — הלכות חודש אלול' },
   ],
   coverage: 'full',
 };

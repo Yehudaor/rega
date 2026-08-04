@@ -43,6 +43,8 @@ export interface DayZmanim {
   plag: Date;
   sunset: Date;
   tzeit: Date;
+  /** צאת הכוכבים דרבנו תם — 72 דקות אחרי השקיעה */
+  tzeitRT: Date;
   chatzotNight: Date;
 }
 

@@ -127,6 +127,7 @@ export const tishaBav: EventContent = {
     { label: 'תלמוד בבלי', ref: 'תענית כט' },
     { label: 'רמב״ם', ref: 'הלכות תעניות, פרק ה' },
     { label: 'שולחן ערוך', ref: 'אורח חיים, סימנים תקנ״ב–תקנ״ט' },
+    { label: 'פניני הלכה', ref: 'זמנים — הלכות תשעה באב' },
   ],
   coverage: 'full',
 };
