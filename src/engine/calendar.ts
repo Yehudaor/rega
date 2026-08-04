@@ -2,7 +2,7 @@ import { HDate, HebrewCalendar, Sedra, flags } from '@hebcal/core';
 import type { City, Layer, LayerKind } from './types';
 import { dayZmanim, candleLighting } from './zmanim';
 import { layersFor, slugify } from './layers';
-import { addDays, fmtCivilLong, fmtTime, hebDayMonth, hebMonthName, isoDate, stripNikud } from './format';
+import { addDays, cleanEventName, fmtCivilLong, fmtTime, hebDayMonth, hebMonthName, isoDate, stripNikud } from './format';
 
 export interface CellLabel {
   title: string;
@@ -57,7 +57,7 @@ function cellFor(date: Date, city: City, inMonth: boolean, todayIso: string): Mo
     if (f & CELL_SKIP) continue;
     if (ev.getDesc() === 'Rosh Hashana LaBehemot') continue;
     labels.push({
-      title: stripNikud(ev.render('he')),
+      title: cleanEventName(ev.render('he')),
       kind: classifyForCell(f, ev.getDesc()),
       contentId: slugify(ev.basename()),
     });

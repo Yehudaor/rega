@@ -70,6 +70,7 @@ export function activePeriods(hd: HDate): Layer[] {
       title: 'עשרת ימי תשובה',
       kind: 'period',
       rank: 35,
+      contentId: 'aseret-yemei-teshuva',
       detail: 'מראש השנה עד יום הכיפורים; תוספות בתפילה',
     });
   }

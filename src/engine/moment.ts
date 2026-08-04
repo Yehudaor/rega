@@ -2,7 +2,7 @@ import { HDate, HebrewCalendar, Sedra, flags, Event } from '@hebcal/core';
 import type { City, Layer, LayerKind, PhaseKey, Snapshot, Transition, UpcomingItem } from './types';
 import { dayZmanim, candleLighting } from './zmanim';
 import { layersFor, slugify } from './layers';
-import { addDays, fmtCivilLong, fmtCivilShort, fmtTime, hebDayMonth, isoDate, stripNikud } from './format';
+import { addDays, cleanEventName, fmtCivilLong, fmtCivilShort, fmtTime, hebDayMonth, isoDate, stripNikud } from './format';
 
 const PHASE_LABEL: Record<PhaseKey, string> = {
   lateNight: 'לילה — לפנות בוקר',
@@ -12,6 +12,11 @@ const PHASE_LABEL: Record<PhaseKey, string> = {
   beinHashmashot: 'בין השמשות',
   night: 'לילה',
 };
+
+/** האם היום העברי הזה הוא שבת או יום טוב (ולכן אין מדליקים בו אש) */
+function isShabbatOrChag(hd: HDate, city: City): boolean {
+  return layersFor(hd, city).some((l) => l.kind === 'shabbat' || l.kind === 'chag');
+}
 
 function phaseOf(now: Date, z: ReturnType<typeof dayZmanim>): PhaseKey {
   if (now < z.alot) return 'lateNight';
@@ -106,7 +111,9 @@ export function makeSnapshot(now: Date, city: City): Snapshot {
       if (isEveningFast) {
         detail = `הצום נכנס הערב בשקיעה (${fmtTime(z.sunset)})`;
       } else if (needsCandles) {
-        detail = `הדלקת נרות ${fmtTime(candleLighting(now, city))} · שקיעה ${fmtTime(z.sunset)}`;
+        detail = isShabbatOrChag(hd, city)
+          ? `הדלקת נרות אחרי צאת הכוכבים (${fmtTime(z.tzeit)}), מאש קיימת`
+          : `הדלקת נרות ${fmtTime(candleLighting(now, city))} · שקיעה ${fmtTime(z.sunset)}`;
       } else if (enteringMajor.kind === 'major-fast' || enteringMajor.kind === 'minor-fast') {
         detail = `הצום יתחיל מחר בעלות השחר`;
       } else {
@@ -131,8 +138,18 @@ export function makeSnapshot(now: Date, city: City): Snapshot {
   if (shabbatOrChagTonight) {
     // אחרי שקיעה — היום העברי הבא נכנס מחר בערב (האזרחי)
     const candleDay = afterSunset ? addDays(now, 1) : now;
-    const candle = candleLighting(candleDay, city);
-    push(candle, `הדלקת נרות — ${shabbatOrChagTonight.kind === 'shabbat' ? 'כניסת שבת' : shabbatOrChagTonight.title} (${city.name})`, 92);
+    const zCandleDay = afterSunset ? dayZmanim(candleDay, city) : z;
+    // יום טוב שנכנס במוצאי שבת או במוצאי יום טוב: מדליקים רק אחרי צאת הכוכבים, מאש קיימת
+    const fromExistingFlame = isShabbatOrChag(new HDate(candleDay), city);
+    const candle = fromExistingFlame ? zCandleDay.tzeit : candleLighting(candleDay, city);
+    const what = shabbatOrChagTonight.kind === 'shabbat' ? 'כניסת שבת' : shabbatOrChagTonight.title;
+    push(
+      candle,
+      fromExistingFlame
+        ? `הדלקת נרות — ${what} (אחרי צאת הכוכבים, מאש קיימת)`
+        : `הדלקת נרות — ${what} (${city.name})`,
+      92,
+    );
   }
   if (!afterSunset && enteringFast) {
     // צום שנכנס הערב בשקיעה (ט' באב, יום כיפור)
@@ -263,7 +280,7 @@ function upcomingItems(now: Date, city: City): UpcomingItem[] {
       byDate.set(key, entry);
     }
     entry.pieces.push({
-      title: stripNikud(ev.render('he')),
+      title: cleanEventName(ev.render('he')),
       kind,
       contentId: slugify(ev.basename()),
       rank: rank[kind],

@@ -1,8 +1,8 @@
 import { Event, HDate, HebrewCalendar, Sedra, flags, months } from '@hebcal/core';
 import type { City, Layer, LayerKind, PhaseKey } from './types';
 import { activePeriods } from './periods';
-import { dayZmanim } from './zmanim';
-import { fmtTime, hebDayMonth, stripNikud, addDays, dayWord } from './format';
+import { dayZmanim, candleLighting } from './zmanim';
+import { fmtTime, hebDayMonth, stripNikud, addDays, dayWord, cleanEventName } from './format';
 
 const RANK: Record<LayerKind, number> = {
   'major-fast': 100,
@@ -37,7 +37,14 @@ export function registerContentIds(ids: string[]): void {
 }
 
 function resolveContentId(slug: string, kind: LayerKind): string | undefined {
-  if (knownContent.has(slug)) return slug;
+  // התאמה מדויקת, ואז קיצור הדרגתי: "rosh-hashana-ii" ← "rosh-hashana"
+  let s = slug;
+  while (s) {
+    if (knownContent.has(s)) return s;
+    const cut = s.lastIndexOf('-');
+    if (cut < 0) break;
+    s = s.slice(0, cut);
+  }
   if (kind === 'rosh-chodesh' && knownContent.has('rosh-chodesh')) return 'rosh-chodesh';
   if (kind === 'shabbat' && knownContent.has('shabbat')) return 'shabbat';
   if (kind === 'special-shabbat' && knownContent.has('special-shabbat')) return 'special-shabbat';
@@ -90,14 +97,19 @@ export interface FastWindow {
   startsEvening: boolean;
 }
 
-/** חלון צום: ט' באב ויום כיפור נכנסים בשקיעה/ערב; שאר הצומות מעלות השחר */
+/**
+ * חלון צום: ט' באב ויום כיפור נכנסים בערב; שאר הצומות מעלות השחר.
+ * ביום כיפור הכניסה בזמן הדלקת הנרות (תוספת מחול על הקודש), כמקובל בלוחות.
+ */
 export function fastWindow(slug: string, hd: HDate, city: City): FastWindow {
   const day = hd.greg();
   const z = dayZmanim(day, city);
-  const evening = slug === 'tisha-bav' || slug === 'yom-kippur';
-  if (evening) {
-    const prev = dayZmanim(addDays(day, -1), city);
-    return { start: prev.sunset, end: z.tzeit, startsEvening: true };
+  const prevDay = addDays(day, -1);
+  if (slug === 'yom-kippur') {
+    return { start: candleLighting(prevDay, city), end: z.tzeit, startsEvening: true };
+  }
+  if (slug === 'tisha-bav') {
+    return { start: dayZmanim(prevDay, city).sunset, end: z.tzeit, startsEvening: true };
   }
   return { start: z.alot, end: z.tzeit, startsEvening: false };
 }
@@ -133,7 +145,7 @@ export function layersFor(hd: HDate, city: City, opts: LayersOptions = {}): Laye
 
     const kind = classify(ev);
     const slug = slugify(ev.basename());
-    const title = stripNikud(ev.render('he'));
+    const title = cleanEventName(ev.render('he'));
     const layer: Layer = {
       id: slug,
       title,
@@ -145,7 +157,11 @@ export function layersFor(hd: HDate, city: City, opts: LayersOptions = {}): Laye
     if (kind === 'major-fast' || kind === 'minor-fast') {
       const w = fastWindow(slug, hd, city);
       layer.window = { start: w.start, end: w.end };
-      const startName = w.startsEvening ? 'שקיעה' : 'עלות השחר';
+      const startName = !w.startsEvening
+        ? 'עלות השחר'
+        : slug === 'yom-kippur'
+          ? 'הדלקת נרות'
+          : 'שקיעה';
       if (opts.now) {
         const active = opts.now >= w.start && opts.now < w.end;
         const ended = opts.now >= w.end;

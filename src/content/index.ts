@@ -8,6 +8,9 @@ import { roshChodesh } from './rosh-chodesh';
 import { tuBav } from './tu-bav';
 import { elul } from './elul';
 import { parsha } from './parsha';
+import { roshHashana } from './rosh-hashana';
+import { yomKippur } from './yom-kippur';
+import { aseretYemeiTeshuva } from './aseret-yemei-teshuva';
 
 const pages: EventContent[] = [
   tishaBav,
@@ -18,6 +21,9 @@ const pages: EventContent[] = [
   tuBav,
   elul,
   parsha,
+  roshHashana,
+  yomKippur,
+  aseretYemeiTeshuva,
 ];
 
 const registry = new Map(pages.map((p) => [p.id, p]));

@@ -28,6 +28,18 @@ export function fmtCivilShort(d: Date): string {
   return shortDateFmt.format(d);
 }
 
+/** ניסוחים מלאים יותר מברירת המחדל של הספרייה */
+const NAME_OVERRIDES: Record<string, string> = {
+  'יום כפור': 'יום הכיפורים',
+  'ערב יום כפור': 'ערב יום הכיפורים',
+};
+
+/** שם מועד נקי — בלי מספר שנה לועזי ("ראש השנה 5787" ← "ראש השנה") */
+export function cleanEventName(s: string): string {
+  const clean = stripNikud(s).replace(/\s+\d{4}$/, '').trim();
+  return NAME_OVERRIDES[clean] ?? clean;
+}
+
 /** "ט׳ באב תשפ״ו" */
 export function hebDateStr(hd: HDate): string {
   return stripNikud(hd.renderGematriya());
