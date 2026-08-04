@@ -1,14 +1,18 @@
 /**
- * מחולל פידי iCal — קובץ לכל עיר, מהיום ועד 4 שנים קדימה.
- * רץ אוטומטית לפני build (סקריפט prebuild) וכותב אל public/.
- * ההרשמה: גוגל — "הוספת יומן מכתובת URL"; אפל — "מנוי ליומן חדש".
+ * מחולל פידי iCal — מהיום ועד 4 שנים קדימה, אל public/.
+ * רץ אוטומטית לפני build (סקריפט prebuild).
+ *
+ * שני סוגי פידים:
+ *   rega.ics          — הפיד הראשי: חגים, מועדים, ראשי חודשים ופרשות.
+ *                       זהה לכל הארץ, ולכן קישור אחד שאפשר לשלוח לכל אחד.
+ *   rega-<city>.ics   — אותו לוח + הדלקת נרות והבדלה לפי העיר (למי שרוצה זמנים).
  *
  * הערה: רשימת הערים משוכפלת מ־src/engine/cities.ts — לשמור מסונכרן.
  */
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { HebrewCalendar, Location } from '@hebcal/core';
+import { HebrewCalendar, Location, flags } from '@hebcal/core';
 import { eventsToIcalendar } from '@hebcal/icalendar';
 
 const CITIES = [
@@ -27,6 +31,30 @@ const CITIES = [
   { id: 'eilat',       name: 'אילת',      lat: 29.558, lon: 34.948, candleMins: 20 },
 ];
 
+/** ימי ציון קטנים שהופכים את היומן לרועש */
+const SKIP_DESC = new Set([
+  'Leil Selichot',
+  'Yom HaAliyah', 'Yom HaAliyah School Observance',
+  'Herzl Day', 'Ben-Gurion Day', 'Jabotinsky Day', 'Rabin Day',
+  'Family Day', 'Hebrew Language Day', 'Chag HaBanot', 'Sigd',
+  'Yom HaKippurim Katan', 'Purim Katan', 'Shushan Purim Katan',
+  'Pesach Sheni', 'Rosh Hashana LaBehemot',
+]);
+
+const SKIP_FLAGS = flags.EREV | flags.MOLAD | flags.SHABBAT_MEVARCHIM | flags.YOM_KIPPUR_KATAN;
+
+const isZman = (ev) => {
+  const d = ev.getDesc();
+  return d === 'Candle lighting' || d === 'Havdalah';
+};
+
+function keep(ev, withZmanim) {
+  if (isZman(ev)) return withZmanim;
+  if (ev.getFlags() & SKIP_FLAGS) return false;
+  if (SKIP_DESC.has(ev.getDesc())) return false;
+  return true;
+}
+
 const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 mkdirSync(outDir, { recursive: true });
 
@@ -34,33 +62,52 @@ const now = new Date();
 const start = new Date(now.getFullYear(), now.getMonth(), 1);
 const end = new Date(now.getFullYear() + 4, now.getMonth(), 1);
 
-for (const city of CITIES) {
-  const location = new Location(city.lat, city.lon, true, 'Asia/Jerusalem', city.name, 'IL');
+async function build({ file, title, caldesc, relcalid, location, candleMins, withZmanim }) {
   const events = HebrewCalendar.calendar({
     start,
     end,
     il: true,
     sedrot: true,
-    candlelighting: true,
-    candleLightingMins: city.candleMins,
-    havdalahDeg: 8.5,
-    location,
+    candlelighting: withZmanim,
+    ...(withZmanim ? { candleLightingMins: candleMins, havdalahDeg: 8.5, location } : {}),
     locale: 'he-x-NoNikud',
     yomKippurKatan: false,
     molad: false,
-  });
+  }).filter((ev) => keep(ev, withZmanim));
 
   const ics = await eventsToIcalendar(events, {
-    title: `רגע · ${city.name}`,
-    caldesc: `זמנים עבריים לפי ${city.name}: שבתות, חגים, צומות, ראשי חודשים ופרשות. נוצר על ידי "רגע" — זמן עברי ואזרחי.`,
-    prodid: `-//rega//iCal ${city.id}//HE`,
-    relcalid: `rega-${city.id}`,
+    title,
+    caldesc,
+    prodid: `-//rega//iCal ${relcalid}//HE`,
+    relcalid,
     locale: 'he-x-NoNikud',
-    location,
     il: true,
+    ...(withZmanim ? { location } : {}),
   });
 
-  writeFileSync(join(outDir, `rega-${city.id}.ics`), ics, 'utf8');
-  console.log(`✓ rega-${city.id}.ics (${events.length} events)`);
+  writeFileSync(join(outDir, file), ics, 'utf8');
+  console.log(`✓ ${file} (${events.length} events)`);
+}
+
+// הפיד הראשי — זהה לכל הארץ
+await build({
+  file: 'rega.ics',
+  title: 'רגע · לוח עברי',
+  caldesc: 'חגים, מועדים, צומות, ראשי חודשים ופרשות השבוע (לוח ארץ ישראל). נוצר על ידי "רגע" — זמן עברי ואזרחי.',
+  relcalid: 'rega',
+  withZmanim: false,
+});
+
+// פידים עם זמני שבת לפי עיר
+for (const city of CITIES) {
+  await build({
+    file: `rega-${city.id}.ics`,
+    title: `רגע · ${city.name} (עם זמני שבת)`,
+    caldesc: `לוח עברי מלא עם הדלקת נרות והבדלה לפי ${city.name}. נוצר על ידי "רגע".`,
+    relcalid: `rega-${city.id}`,
+    location: new Location(city.lat, city.lon, true, 'Asia/Jerusalem', city.name, 'IL'),
+    candleMins: city.candleMins,
+    withZmanim: true,
+  });
 }
 console.log('done');

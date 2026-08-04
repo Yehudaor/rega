@@ -7,6 +7,7 @@ import { NowScreen } from './ui/NowScreen';
 import { MonthView } from './ui/MonthView';
 import { DayView } from './ui/DayView';
 import { EventPage } from './ui/EventPage';
+import { ConnectView } from './ui/ConnectView';
 
 // מצב בדיקה: ?t=2026-07-22T21:00 מדמה זמן אחר (השעון ממשיך לרוץ מאותה נקודה)
 const timeOverride = (() => {
@@ -27,7 +28,8 @@ export type Route =
   | { view: 'month'; mode: 'civil'; y: number; m: number }
   | { view: 'month'; mode: 'hebrew'; hy: number; hm: number }
   | { view: 'day'; iso: string }
-  | { view: 'event'; id: string; iso?: string };
+  | { view: 'event'; id: string; iso?: string }
+  | { view: 'connect' };
 
 function parseHash(): Route {
   const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
@@ -44,6 +46,7 @@ function parseHash(): Route {
     const [hy, hm] = parts[1].split('-').map(Number);
     if (hy && hm) return { view: 'month', mode: 'hebrew', hy, hm };
   }
+  if (parts[0] === 'connect') return { view: 'connect' };
   if (parts[0] === 'day' && parts[1]) return { view: 'day', iso: parts[1] };
   if (parts[0] === 'event' && parts[1]) {
     return { view: 'event', id: decodeURIComponent(parts[1]), iso: parts[2] };
@@ -105,7 +108,6 @@ export function App() {
   const [city, setCityId] = useCity();
   const [minhag, setMinhag] = useMinhag();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [onboarded, setOnboardedState] = useState<boolean>(() => {
     try { return localStorage.getItem('rega-onboarded') === '1'; } catch { return true; }
   });
@@ -115,9 +117,6 @@ export function App() {
   };
   const [now, setNow] = useState(() => realNow());
 
-  // כתובת פיד היומן של העיר הנבחרת — עובדת גם מקומית וגם באתר המפורסם
-  const icsUrl =
-    location.origin + location.pathname.replace(/[^/]*$/, '') + `rega-${city.id}.ics`;
 
   useEffect(() => {
     const t = setInterval(() => setNow(realNow()), 1000);
@@ -141,6 +140,7 @@ export function App() {
         <nav className="tabs">
           <a className={isNow ? 'tab active' : 'tab'} href="#/">עכשיו</a>
           <a className={isMonth ? 'tab active' : 'tab'} href="#/month">חודש</a>
+          <a className={route.view === 'connect' ? 'tab active' : 'tab'} href="#/connect">יומן</a>
         </nav>
         <button className="city-btn" onClick={() => setSettingsOpen(true)} title="מיקום">
           📍 {city.name}
@@ -154,6 +154,7 @@ export function App() {
         {route.view === 'event' && (
           <EventPage id={route.id} iso={route.iso} city={city} snap={snap} minhag={minhag} />
         )}
+        {route.view === 'connect' && <ConnectView city={city} />}
       </main>
 
       {settingsOpen && (
@@ -206,31 +207,9 @@ export function App() {
             </select>
 
             <hr className="modal-sep" />
-            <h2>חיבור ליומן גוגל / אפל</h2>
-            <p className="muted small">
-              הירשמו לפיד ולוח "רגע" יופיע כלוח־משנה בתוך היומן הקיים שלכם — שבתות, חגים,
-              צומות, ראשי חודשים ופרשות ({city.name}), ארבע שנים קדימה, לצד האירועים הרגילים.
-            </p>
-            <div className="ics-row" dir="ltr">
-              <input className="ics-url" readOnly value={icsUrl} onFocus={(e) => e.currentTarget.select()} />
-              <button
-                className="btn-secondary"
-                onClick={() => {
-                  navigator.clipboard?.writeText(icsUrl).then(() => {
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  });
-                }}
-              >
-                {copied ? '✓ הועתק' : 'העתקה'}
-              </button>
-            </div>
-            <ul className="ics-help muted small">
-              <li><b>גוגל</b> (במחשב): הגדרות ← הוספת יומן ← מכתובת URL ← הדביקו את הקישור.</li>
-              <li><b>אייפון</b>: הגדרות ← לוח שנה ← חשבונות ← הוספת חשבון ← אחר ← הוספת מינוי ללוח שנה.</li>
-              <li><b>מק</b>: לוח שנה ← קובץ ← מינוי לוח שנה חדש.</li>
-              <li>למניעת כפילויות: אם מופעל אצלכם יומן "חגים יהודיים" המובנה של גוגל — כדאי לכבותו.</li>
-            </ul>
+            <a className="btn-secondary btn-link" href="#/connect" onClick={() => setSettingsOpen(false)}>
+              חיבור ליומן גוגל / אפל ←
+            </a>
 
             <button className="btn-primary" onClick={() => setSettingsOpen(false)}>סגירה</button>
           </div>
