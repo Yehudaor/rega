@@ -37,8 +37,7 @@ const SKIP_DESC = new Set([
   'Yom HaAliyah', 'Yom HaAliyah School Observance',
   'Herzl Day', 'Ben-Gurion Day', 'Jabotinsky Day', 'Rabin Day',
   'Family Day', 'Hebrew Language Day', 'Chag HaBanot', 'Sigd',
-  'Yom HaKippurim Katan', 'Purim Katan', 'Shushan Purim Katan',
-  'Pesach Sheni', 'Rosh Hashana LaBehemot',
+  'Yom HaKippurim Katan', 'Rosh Hashana LaBehemot',
 ]);
 
 const SKIP_FLAGS = flags.EREV | flags.MOLAD | flags.SHABBAT_MEVARCHIM | flags.YOM_KIPPUR_KATAN;
@@ -61,6 +60,32 @@ mkdirSync(outDir, { recursive: true });
 const now = new Date();
 const start = new Date(now.getFullYear(), now.getMonth(), 1);
 const end = new Date(now.getFullYear() + 4, now.getMonth(), 1);
+
+/** פיד נפרד: התאריך העברי בכל יום, כאירוע יום־שלם */
+async function buildHebrewDates() {
+  const events = HebrewCalendar.calendar({
+    start,
+    end,
+    il: true,
+    addHebrewDates: true,
+    locale: 'he-x-NoNikud',
+    yomKippurKatan: false,
+    molad: false,
+  }).filter((ev) => ev.getFlags() & flags.HEBREW_DATE);
+
+  const ics = await eventsToIcalendar(events, {
+    title: 'רגע · תאריך עברי',
+    caldesc:
+      'התאריך העברי בכל יום, כאירוע יום־שלם. שימו לב: יומנים בנויים על יממה שמתחילה בחצות, ולכן התאריך מוצג ליום האזרחי ואינו מתחלף בשקיעה.',
+    prodid: '-//rega//iCal dates//HE',
+    relcalid: 'rega-dates',
+    locale: 'he-x-NoNikud',
+    il: true,
+  });
+
+  writeFileSync(join(outDir, 'rega-dates.ics'), ics, 'utf8');
+  console.log(`✓ rega-dates.ics (${events.length} events)`);
+}
 
 async function build({ file, title, caldesc, relcalid, location, candleMins, withZmanim }) {
   const events = HebrewCalendar.calendar({
@@ -97,6 +122,8 @@ await build({
   relcalid: 'rega',
   withZmanim: false,
 });
+
+await buildHebrewDates();
 
 // פידים עם זמני שבת לפי עיר
 for (const city of CITIES) {

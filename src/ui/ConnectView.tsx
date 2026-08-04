@@ -87,6 +87,23 @@ export function ConnectView({ city }: { city: City }) {
       </details>
 
       <details className="big-sec">
+        <summary>רוצים לראות את התאריך העברי בכל יום ביומן?</summary>
+        <div className="content-sub">
+          <p className="muted small">
+            לוח נפרד שמוסיף את התאריך העברי כאירוע יום־שלם בכל יום — פתרון למי שהיומן שלו
+            (כמו אפל) לא יודע להציג תאריך עברי. שימו לב לשתי מגבלות: זה מוסיף אירוע בכל
+            יום ביומן, והתאריך מוצג לפי היום האזרחי — כלומר <b>אינו מתחלף בשקיעה</b>.
+            בגוגל עדיף להשתמש בהגדרה המובנית: הגדרות ← כללי ← לוח שנה חלופי ← עברי.
+          </p>
+          <FeedBlock
+            title="תאריך עברי יומי"
+            note="אירוע יום־שלם עם התאריך העברי, למשל ״כ״א באב״."
+            url={`${base}rega-dates.ics`}
+          />
+        </div>
+      </details>
+
+      <details className="big-sec">
         <summary>הוראות ידניות (אם הכפתור לא עבד)</summary>
         <div className="content-sub">
           <ul className="blocks">
