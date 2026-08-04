@@ -18,6 +18,9 @@ export type LayerKind =
   | 'period'
   | 'parsha';
 
+/** העדפת מנהג — משפיעה על סדר והדגשה של תוכן, לא מסתירה כלום */
+export type Minhag = 'ashkenaz' | 'sefard' | 'all';
+
 export interface City {
   id: string;
   name: string;

@@ -332,6 +332,18 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .tag-hist { color: var(--k-parsha); border-color: color-mix(in srgb, var(--k-parsha) 45%, transparent); }
 .tag-state { color: var(--k-modern); border-color: color-mix(in srgb, var(--k-modern) 45%, transparent); }
 .tag-note { color: var(--muted); border-color: var(--border); }
+.tag-minhag { color: var(--accent-heb); border-color: color-mix(in srgb, var(--accent-heb) 45%, transparent); }
+.other-minhag { opacity: 0.62; border-top: 1px dashed var(--border); margin-top: 6px; padding-top: 2px; }
+
+.shabbat-times table { width: 100%; border-collapse: collapse; }
+.shabbat-times th {
+  text-align: start; font-size: 0.75rem; color: var(--muted); font-weight: 600;
+  padding: 2px 6px; border-bottom: 1px solid var(--border);
+}
+.shabbat-times td { padding: 6px; font-size: 0.95rem; border-bottom: 1px dashed var(--border); }
+.shabbat-times tr:last-child td { border-bottom: none; }
+.shabbat-times td[dir='ltr'] { font-variant-numeric: tabular-nums; font-weight: 600; text-align: start; }
+.shabbat-times td:first-child { color: var(--muted); }
 
 details { margin-bottom: 10px; }
 details > summary {
@@ -389,6 +401,14 @@ details > *:not(summary) { margin: 0; }
 .btn-secondary { background: var(--bg); color: var(--text); }
 
 .modal-sep { border: 0; border-top: 1px solid var(--border); margin: 6px 0; width: 100%; }
+.ob-label { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-top: 4px; }
+.ob-choices { display: flex; flex-direction: column; gap: 6px; }
+.ob-choice {
+  font-family: inherit; font-size: 0.95rem; padding: 10px 14px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  cursor: pointer; text-align: start;
+}
+.ob-choice.active { border-color: var(--accent-heb); color: var(--accent-heb); font-weight: 600; }
 .ics-row { display: flex; gap: 8px; }
 .ics-url {
   flex: 1; min-width: 0; font-family: inherit; font-size: 0.8rem;

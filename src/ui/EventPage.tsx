@@ -1,6 +1,6 @@
 import { HDate } from '@hebcal/core';
-import type { City, Snapshot } from '../engine/types';
-import type { EventContent, NowPhase, Section, TimeKey } from '../content/model';
+import type { City, Minhag, Snapshot } from '../engine/types';
+import type { Block, EventContent, NowPhase, Section, TimeKey } from '../content/model';
 import { getContent } from '../content';
 import { layersFor } from '../engine/layers';
 import { dayZmanim, candleLighting } from '../engine/zmanim';
@@ -45,33 +45,52 @@ function currentPhaseFor(hdEvent: HDate, snap: Snapshot): NowPhase | undefined {
   return undefined;
 }
 
-function Blocks({ blocks }: { blocks: { tag?: any; text: string }[] }) {
+const MINHAG_TAG: Record<'ashkenaz' | 'sefard', string> = {
+  ashkenaz: 'מנהג אשכנז',
+  sefard: 'מנהג ספרד',
+};
+
+function BlockLine({ b }: { b: Block }) {
   return (
-    <ul className="blocks">
-      {blocks.map((b, i) => (
-        <li key={i}>
-          {b.tag && <TagBadge tag={b.tag} />}
-          <span>{b.text}</span>
-        </li>
-      ))}
-    </ul>
+    <li>
+      {b.minhag ? <span className="tag tag-minhag">{MINHAG_TAG[b.minhag]}</span> : b.tag && <TagBadge tag={b.tag} />}
+      <span>{b.text}</span>
+    </li>
   );
 }
 
-function SectionList({ sections }: { sections: Section[] }) {
+/** מציג קודם את מה שנוגע למנהג המשתמש; מנהגים אחרים — בשקט, בהמשך */
+function Blocks({ blocks, minhag }: { blocks: Block[]; minhag: Minhag }) {
+  const mine = blocks.filter((b) => !b.minhag || minhag === 'all' || b.minhag === minhag);
+  const other = blocks.filter((b) => b.minhag && minhag !== 'all' && b.minhag !== minhag);
+  return (
+    <>
+      <ul className="blocks">
+        {mine.map((b, i) => <BlockLine key={i} b={b} />)}
+      </ul>
+      {other.length > 0 && (
+        <ul className="blocks other-minhag">
+          {other.map((b, i) => <BlockLine key={i} b={b} />)}
+        </ul>
+      )}
+    </>
+  );
+}
+
+function SectionList({ sections, minhag }: { sections: Section[]; minhag: Minhag }) {
   return (
     <>
       {sections.map((s, i) => (
         <div key={i} className="content-sub">
           <h4>{s.title}</h4>
-          <Blocks blocks={s.blocks} />
+          <Blocks blocks={s.blocks} minhag={minhag} />
         </div>
       ))}
     </>
   );
 }
 
-export function EventPage({ id, iso, city, snap }: { id: string; iso?: string; city: City; snap: Snapshot }) {
+export function EventPage({ id, iso, city, snap, minhag }: { id: string; iso?: string; city: City; snap: Snapshot; minhag: Minhag }) {
   const content: EventContent | undefined = getContent(id);
   const date = iso ? parseIso(iso) : new Date();
   const hd = new HDate(date);
@@ -138,7 +157,7 @@ export function EventPage({ id, iso, city, snap }: { id: string; iso?: string; c
                   {w.title}
                   {isNow && <span className="chip live small-chip">עכשיו</span>}
                 </summary>
-                <Blocks blocks={w.items} />
+                <Blocks blocks={w.items} minhag={minhag} />
               </details>
             );
           })}
@@ -167,19 +186,19 @@ export function EventPage({ id, iso, city, snap }: { id: string; iso?: string; c
       {content.practical && (
         <details className="big-sec" open>
           <summary>למעשה</summary>
-          <SectionList sections={content.practical} />
+          <SectionList sections={content.practical} minhag={minhag} />
         </details>
       )}
       {content.background && (
         <details className="big-sec">
           <summary>רקע ומשמעות</summary>
-          <SectionList sections={content.background} />
+          <SectionList sections={content.background} minhag={minhag} />
         </details>
       )}
       {content.differences && (
         <details className="big-sec">
           <summary>הבדלי מנהגים</summary>
-          <SectionList sections={content.differences} />
+          <SectionList sections={content.differences} minhag={minhag} />
         </details>
       )}
       {content.sources && (

@@ -1,6 +1,48 @@
+import { HDate } from '@hebcal/core';
 import type { Snapshot, Layer } from '../engine/types';
-import { dayWord, fmtTime, isoDate } from '../engine/format';
+import { addDays, dayWord, fmtTime, hebDayMonth, isoDate } from '../engine/format';
+import { findCity } from '../engine/cities';
+import { candleLighting, dayZmanim } from '../engine/zmanim';
 import { Card, KindChip, TimeBar } from './bits';
+
+const SHABBAT_CITIES = ['jerusalem', 'tel-aviv', 'haifa', 'beer-sheva'];
+
+/** זמני כניסה ויציאה לארבע הערים הגדולות — כמו בלוחות המודפסים */
+function ShabbatTimesCard({ now }: { now: Date }) {
+  const delta = (6 - now.getDay() + 7) % 7;
+  const sat = addDays(now, delta);
+  const fri = addDays(sat, -1);
+  const satHd = new HDate(sat);
+  return (
+    <>
+      <h2 className="sec-title">
+        {delta === 0 ? 'זמני השבת' : 'השבת הקרובה'} · {hebDayMonth(satHd)}
+      </h2>
+      <Card className="shabbat-times">
+        <table>
+          <thead>
+            <tr><th></th><th>כניסה</th><th>יציאה</th></tr>
+          </thead>
+          <tbody>
+            {SHABBAT_CITIES.map((id) => {
+              const c = findCity(id);
+              return (
+                <tr key={id}>
+                  <td>{c.name}</td>
+                  <td dir="ltr">{fmtTime(candleLighting(fri, c))}</td>
+                  <td dir="ltr">{fmtTime(dayZmanim(sat, c).tzeit)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <p className="muted small">
+          כניסה — הדלקת נרות (ירושלים 40 דק׳ לפני השקיעה, חיפה 30, השאר 20) · יציאה — צאת הכוכבים
+        </p>
+      </Card>
+    </>
+  );
+}
 
 const clockFmt = new Intl.DateTimeFormat('he-IL', {
   hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Jerusalem',
@@ -103,6 +145,9 @@ export function NowScreen({ snap, now }: { snap: Snapshot; now: Date }) {
           </Card>
         </>
       )}
+
+      {/* ===== זמני השבת — ארבע הערים ===== */}
+      <ShabbatTimesCard now={now} />
 
       {/* ===== רקע שקט ===== */}
       {quiet.length > 0 && (

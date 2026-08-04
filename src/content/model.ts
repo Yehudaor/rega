@@ -16,6 +16,8 @@ export type Tag =
 
 export interface Block {
   tag?: Tag;
+  /** אם הפסקה נוהגת רק בקהילות מסוימות */
+  minhag?: 'ashkenaz' | 'sefard';
   text: string;
 }
 
