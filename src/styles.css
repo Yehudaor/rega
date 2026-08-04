@@ -332,6 +332,19 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .tag-hist { color: var(--k-parsha); border-color: color-mix(in srgb, var(--k-parsha) 45%, transparent); }
 .tag-state { color: var(--k-modern); border-color: color-mix(in srgb, var(--k-modern) 45%, transparent); }
 .tag-note { color: var(--muted); border-color: var(--border); }
+.tag-today { color: var(--k-modern); border-color: color-mix(in srgb, var(--k-modern) 45%, transparent); }
+.sources a { color: var(--accent-civil); text-decoration: underline; }
+.foot-link, .disclaimer a { color: var(--accent-civil); text-decoration: underline; }
+.about-p { font-size: 0.94rem; margin: 8px 0 0; }
+.about-p a { color: var(--accent-civil); text-decoration: underline; }
+.about-view h3 { font-size: 1.05rem; }
+.about-warn {
+  border-inline-start: 3px solid var(--accent-heb);
+  padding-inline-start: 10px;
+  background: color-mix(in srgb, var(--accent-heb) 6%, transparent);
+  border-radius: 0 8px 8px 0;
+  padding-block: 8px;
+}
 .tag-minhag { color: var(--accent-heb); border-color: color-mix(in srgb, var(--accent-heb) 45%, transparent); }
 .other-minhag { opacity: 0.62; border-top: 1px dashed var(--border); margin-top: 6px; padding-top: 2px; }
 

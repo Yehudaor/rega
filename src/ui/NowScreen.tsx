@@ -9,7 +9,9 @@ const SHABBAT_CITIES = ['jerusalem', 'tel-aviv', 'haifa', 'beer-sheva'];
 
 /** זמני כניסה ויציאה לארבע הערים הגדולות — כמו בלוחות המודפסים */
 function ShabbatTimesCard({ now }: { now: Date }) {
-  const delta = (6 - now.getDay() + 7) % 7;
+  let delta = (6 - now.getDay() + 7) % 7;
+  // במוצאי שבת כבר מציגים את השבת הבאה
+  if (delta === 0 && now >= dayZmanim(now, findCity('jerusalem')).tzeit) delta = 7;
   const sat = addDays(now, delta);
   const fri = addDays(sat, -1);
   const satHd = new HDate(sat);

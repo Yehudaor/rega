@@ -12,6 +12,7 @@ export type Tag =
   | 'היסטוריה'
   | 'ממלכתי'
   | 'מחלוקת'
+  | 'בימינו'
   | 'הערה';
 
 export interface Block {
@@ -59,7 +60,7 @@ export interface EventContent {
   practical?: Section[];
   background?: Section[];
   differences?: Section[];
-  sources?: { label: string; ref: string }[];
+  sources?: { label: string; ref: string; url?: string }[];
   /** שקיפות כיסוי: עמוד מלא או תקציר בלבד */
   coverage: 'full' | 'summary';
 }

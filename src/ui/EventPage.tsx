@@ -115,7 +115,10 @@ export function EventPage({ id, iso, city, snap, minhag }: { id: string; iso?: s
     );
   }
 
-  const activePhase = iso ? currentPhaseFor(hd, snap) : undefined;
+  // מועד רב־יומי (חנוכה, סוכות, פסח) עדיין פעיל גם כשהיום העברי התקדם
+  const activeToday = snap.layers.some((l) => l.contentId === content.id);
+  const rawPhase = iso ? currentPhaseFor(hd, snap) : undefined;
+  const activePhase = rawPhase === 'motzaei' && activeToday ? undefined : rawPhase;
   const showInstance = Boolean(iso) && content.kind !== 'period' && content.kind !== 'parsha';
 
   return (
@@ -127,9 +130,8 @@ export function EventPage({ id, iso, city, snap, minhag }: { id: string; iso?: s
           <KindChip kind={content.kind} />
           {activePhase === 'erev' && <span className="chip live">נכנס הערב</span>}
           {activePhase === 'motzaei' && <span className="chip">הסתיים</span>}
-          {activePhase && activePhase !== 'motzaei' && activePhase !== 'erev' && (
-            <span className="chip live">מתרחש עכשיו</span>
-          )}
+          {((activePhase && activePhase !== 'motzaei' && activePhase !== 'erev') ||
+            (!activePhase && activeToday)) && <span className="chip live">מתרחש עכשיו</span>}
         </div>
         <h1>{content.name}</h1>
         {showInstance && (
@@ -216,7 +218,8 @@ export function EventPage({ id, iso, city, snap, minhag }: { id: string; iso?: s
         <p className="coverage-note">זהו תקציר — העמוד המלא בהכנה.</p>
       )}
       <p className="disclaimer">
-        המידע כאן להתמצאות; הוא מפריד בין דין, מנהג והיסטוריה, אך אינו תחליף לפסיקת הלכה.
+        המידע כאן להתמצאות; הוא מפריד בין דין, מנהג והיסטוריה, אך אינו תחליף לפסיקת הלכה.{' '}
+        <a href="#/about">איך נכתב התוכן ←</a>
       </p>
     </div>
   );

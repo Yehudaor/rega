@@ -8,6 +8,7 @@ import { MonthView } from './ui/MonthView';
 import { DayView } from './ui/DayView';
 import { EventPage } from './ui/EventPage';
 import { ConnectView } from './ui/ConnectView';
+import { AboutView } from './ui/AboutView';
 
 // מצב בדיקה: ?t=2026-07-22T21:00 מדמה זמן אחר (השעון ממשיך לרוץ מאותה נקודה)
 const timeOverride = (() => {
@@ -29,7 +30,8 @@ export type Route =
   | { view: 'month'; mode: 'hebrew'; hy: number; hm: number }
   | { view: 'day'; iso: string }
   | { view: 'event'; id: string; iso?: string }
-  | { view: 'connect' };
+  | { view: 'connect' }
+  | { view: 'about' };
 
 function parseHash(): Route {
   const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
@@ -47,6 +49,7 @@ function parseHash(): Route {
     if (hy && hm) return { view: 'month', mode: 'hebrew', hy, hm };
   }
   if (parts[0] === 'connect') return { view: 'connect' };
+  if (parts[0] === 'about') return { view: 'about' };
   if (parts[0] === 'day' && parts[1]) return { view: 'day', iso: parts[1] };
   if (parts[0] === 'event' && parts[1]) {
     return { view: 'event', id: decodeURIComponent(parts[1]), iso: parts[2] };
@@ -155,6 +158,7 @@ export function App() {
           <EventPage id={route.id} iso={route.iso} city={city} snap={snap} minhag={minhag} />
         )}
         {route.view === 'connect' && <ConnectView city={city} />}
+        {route.view === 'about' && <AboutView />}
       </main>
 
       {settingsOpen && (
@@ -253,7 +257,8 @@ export function App() {
       )}
 
       <footer className="foot">
-        <span>הזמנים מחושבים מקומית לפי {city.name} · הלוח מחושב, לא מוקלד</span>
+        <span>הזמנים מחושבים מקומית לפי {city.name} · </span>
+        <a className="foot-link" href="#/about">מקורות ואמינות</a>
         {timeOverride && <span className="debug-time"> · ⚠ מצב בדיקה: זמן מדומה</span>}
       </footer>
     </div>

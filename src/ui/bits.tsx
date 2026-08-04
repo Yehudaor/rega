@@ -10,7 +10,12 @@ export function KindChip({ kind, text }: { kind: LayerKind; text?: string }) {
 
 export function TagBadge({ tag }: { tag: Tag }) {
   const cls =
-    tag === 'דין' ? 'din' : tag === 'ממלכתי' ? 'state' : tag === 'היסטוריה' ? 'hist' : tag === 'הערה' || tag === 'טיפ' ? 'note' : 'minhag';
+    tag === 'דין' ? 'din'
+      : tag === 'ממלכתי' ? 'state'
+      : tag === 'היסטוריה' ? 'hist'
+      : tag === 'בימינו' ? 'today'
+      : tag === 'הערה' || tag === 'טיפ' ? 'note'
+      : 'minhag';
   return <span className={`tag tag-${cls}`}>{tag}</span>;
 }
 
