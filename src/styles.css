@@ -1,0 +1,418 @@
+/* ===== רגע · עיצוב יסוד ===== */
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #f6f4ef;
+  --card: #ffffff;
+  --text: #23262c;
+  --muted: #6b7280;
+  --border: #e6e1d6;
+  --shadow: 0 1px 3px rgba(30, 30, 40, 0.06);
+  --accent-heb: #a2731f;
+  --accent-civil: #3f68a6;
+  --live: #b3555e;
+
+  --night: #2e3650;
+  --dawn: #eec06a;
+  --day: #ffe9a8;
+
+  --k-major-fast: #a84b55;
+  --k-minor-fast: #a8654b;
+  --k-chag: #ab8415;
+  --k-chol-hamoed: #ab8415;
+  --k-shabbat: #6f61c4;
+  --k-special-shabbat: #8579cf;
+  --k-rosh-chodesh: #2f8f89;
+  --k-omer: #4c9463;
+  --k-chanukah: #bd7f27;
+  --k-purim: #b75693;
+  --k-memorial: #5f6f8c;
+  --k-modern: #3f74b3;
+  --k-minor: #b07540;
+  --k-parsha: #71819c;
+  --k-period: #8b8172;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12161f;
+    --card: #1a2029;
+    --text: #e8e6e1;
+    --muted: #99a1ae;
+    --border: #2a3140;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    --accent-heb: #e0b45c;
+    --accent-civil: #7ea6e0;
+    --live: #e08790;
+
+    --night: #0d1119;
+    --dawn: #8a6d3b;
+    --day: #47567a;
+
+    --k-major-fast: #e08790;
+    --k-minor-fast: #dd9b82;
+    --k-chag: #e3c25e;
+    --k-chol-hamoed: #e3c25e;
+    --k-shabbat: #a99ff0;
+    --k-special-shabbat: #b5acf2;
+    --k-rosh-chodesh: #6cc7c0;
+    --k-omer: #85c79c;
+    --k-chanukah: #e5ae62;
+    --k-purim: #e394c8;
+    --k-memorial: #9fb0cc;
+    --k-modern: #86b3e8;
+    --k-minor: #dfa976;
+    --k-parsha: #a3b2cc;
+    --k-period: #bdb3a2;
+  }
+}
+
+html { font-size: 16px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', 'Heebo', 'Noto Sans Hebrew', system-ui, sans-serif;
+  line-height: 1.55;
+}
+
+.app { max-width: 760px; margin: 0 auto; padding: 0 14px 60px; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, h4 { margin: 0; font-weight: 600; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+
+/* ===== כותרת עליונה ===== */
+.topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 2px 10px;
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.brand { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-mark { font-size: 1.35rem; font-weight: 700; color: var(--accent-heb); }
+.brand-sub { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.02em; }
+.tabs { display: flex; gap: 4px; margin-inline-start: 8px; }
+.tab {
+  padding: 6px 14px; border-radius: 999px; font-size: 0.95rem; color: var(--muted);
+}
+.tab.active { background: var(--card); color: var(--text); box-shadow: var(--shadow); font-weight: 600; }
+.city-btn {
+  margin-inline-start: auto;
+  background: none; border: 1px solid var(--border); border-radius: 999px;
+  color: var(--text); padding: 6px 12px; font-size: 0.85rem; cursor: pointer;
+  font-family: inherit;
+}
+.city-btn:hover { border-color: var(--muted); }
+
+.main { padding-top: 16px; }
+
+/* ===== כרטיסים ===== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+.sec-title { font-size: 0.95rem; color: var(--muted); font-weight: 600; margin: 20px 2px 8px; }
+
+/* ===== מסך עכשיו ===== */
+.hero { text-align: center; padding-top: 20px; }
+.hero-clock {
+  font-size: 2.6rem; font-weight: 300; letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums; margin-bottom: 8px;
+}
+.hero-dates { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.hero-row { display: flex; align-items: center; gap: 10px; }
+.coord-label {
+  font-size: 0.68rem; padding: 2px 8px; border-radius: 999px; font-weight: 600;
+}
+.coord-label.civil { background: color-mix(in srgb, var(--accent-civil) 14%, transparent); color: var(--accent-civil); }
+.coord-label.heb { background: color-mix(in srgb, var(--accent-heb) 16%, transparent); color: var(--accent-heb); }
+.hero-civil { font-size: 1.05rem; }
+.hero-heb { font-size: 1.3rem; }
+.hero-heb strong { color: var(--accent-heb); font-weight: 700; }
+.hero-year { color: var(--muted); font-size: 0.95rem; }
+.boundary-note { color: var(--muted); font-size: 0.85rem; margin: 10px 0 6px; }
+.phase-line { display: flex; justify-content: center; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+.motzaei { font-size: 0.85rem; color: var(--accent-heb); }
+
+.chip {
+  display: inline-block; font-size: 0.75rem; font-weight: 600;
+  padding: 2px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--muted) 14%, transparent); color: var(--muted);
+}
+.chip.phase { background: color-mix(in srgb, var(--accent-civil) 12%, transparent); color: var(--accent-civil); }
+.chip.phase-bhs { background: color-mix(in srgb, var(--dawn) 30%, transparent); color: var(--accent-heb); }
+.chip.live { background: color-mix(in srgb, var(--live) 15%, transparent); color: var(--live); }
+.small-chip { margin-inline-start: 8px; font-size: 0.65rem; }
+
+/* צבעי סוגים */
+.kind-major-fast { background: color-mix(in srgb, var(--k-major-fast) 15%, transparent); color: var(--k-major-fast); }
+.kind-minor-fast { background: color-mix(in srgb, var(--k-minor-fast) 15%, transparent); color: var(--k-minor-fast); }
+.kind-chag { background: color-mix(in srgb, var(--k-chag) 15%, transparent); color: var(--k-chag); }
+.kind-chol-hamoed { background: color-mix(in srgb, var(--k-chol-hamoed) 15%, transparent); color: var(--k-chol-hamoed); }
+.kind-shabbat { background: color-mix(in srgb, var(--k-shabbat) 15%, transparent); color: var(--k-shabbat); }
+.kind-special-shabbat { background: color-mix(in srgb, var(--k-special-shabbat) 15%, transparent); color: var(--k-special-shabbat); }
+.kind-rosh-chodesh { background: color-mix(in srgb, var(--k-rosh-chodesh) 15%, transparent); color: var(--k-rosh-chodesh); }
+.kind-omer { background: color-mix(in srgb, var(--k-omer) 15%, transparent); color: var(--k-omer); }
+.kind-chanukah { background: color-mix(in srgb, var(--k-chanukah) 15%, transparent); color: var(--k-chanukah); }
+.kind-purim { background: color-mix(in srgb, var(--k-purim) 15%, transparent); color: var(--k-purim); }
+.kind-memorial { background: color-mix(in srgb, var(--k-memorial) 15%, transparent); color: var(--k-memorial); }
+.kind-modern { background: color-mix(in srgb, var(--k-modern) 15%, transparent); color: var(--k-modern); }
+.kind-minor { background: color-mix(in srgb, var(--k-minor) 15%, transparent); color: var(--k-minor); }
+.kind-parsha { background: color-mix(in srgb, var(--k-parsha) 15%, transparent); color: var(--k-parsha); }
+.kind-period { background: color-mix(in srgb, var(--k-period) 15%, transparent); color: var(--k-period); }
+
+.kb-major-fast { border-inline-start: 3px solid var(--k-major-fast); }
+.kb-minor-fast { border-inline-start: 3px solid var(--k-minor-fast); }
+.kb-chag { border-inline-start: 3px solid var(--k-chag); }
+.kb-chol-hamoed { border-inline-start: 3px solid var(--k-chol-hamoed); }
+.kb-shabbat { border-inline-start: 3px solid var(--k-shabbat); }
+.kb-special-shabbat { border-inline-start: 3px solid var(--k-special-shabbat); }
+.kb-rosh-chodesh { border-inline-start: 3px solid var(--k-rosh-chodesh); }
+.kb-omer { border-inline-start: 3px solid var(--k-omer); }
+.kb-chanukah { border-inline-start: 3px solid var(--k-chanukah); }
+.kb-purim { border-inline-start: 3px solid var(--k-purim); }
+.kb-memorial { border-inline-start: 3px solid var(--k-memorial); }
+.kb-modern { border-inline-start: 3px solid var(--k-modern); }
+.kb-minor { border-inline-start: 3px solid var(--k-minor); }
+.kb-parsha { border-inline-start: 3px solid var(--k-parsha); }
+.kb-period { border-inline-start: 3px solid var(--k-period); }
+
+.kb-text-major-fast { color: var(--k-major-fast); }
+.kb-text-minor-fast { color: var(--k-minor-fast); }
+.kb-text-chag { color: var(--k-chag); }
+.kb-text-chol-hamoed { color: var(--k-chol-hamoed); }
+.kb-text-shabbat { color: var(--k-shabbat); }
+.kb-text-special-shabbat { color: var(--k-special-shabbat); }
+.kb-text-rosh-chodesh { color: var(--k-rosh-chodesh); }
+.kb-text-omer { color: var(--k-omer); }
+.kb-text-chanukah { color: var(--k-chanukah); }
+.kb-text-purim { color: var(--k-purim); }
+.kb-text-memorial { color: var(--k-memorial); }
+.kb-text-modern { color: var(--k-modern); }
+.kb-text-minor { color: var(--k-minor); }
+.kb-text-parsha { color: var(--k-parsha); }
+.kb-text-period { color: var(--k-period); }
+
+/* ===== פס היממה ===== */
+.timebar-wrap { margin-top: 6px; }
+.timebar {
+  position: relative; height: 14px; border-radius: 999px; overflow: visible;
+  border: 1px solid var(--border);
+}
+.tb-marker { position: absolute; top: -4px; width: 2px; height: 22px; border-radius: 2px; }
+.tb-marker.now { background: var(--text); width: 3px; }
+.tb-marker.heb { background: var(--accent-heb); }
+.tb-labels {
+  display: flex; justify-content: space-between; gap: 6px;
+  font-size: 0.7rem; color: var(--muted); margin-top: 6px; flex-wrap: wrap;
+}
+.tb-sunset { color: var(--accent-heb); }
+
+/* ===== שכבות ===== */
+.primary-layer .layer-title { font-size: 1.35rem; font-weight: 700; margin: 6px 0 2px; }
+.layer-card .layer-title { font-size: 1.1rem; font-weight: 600; margin: 6px 0 2px; }
+.layer-head { display: flex; gap: 8px; align-items: center; }
+.layer-detail { color: var(--muted); font-size: 0.92rem; }
+.more-link { display: inline-block; margin-top: 8px; font-size: 0.88rem; color: var(--accent-civil); font-weight: 600; }
+.more-link:hover { text-decoration: underline; }
+
+.secondary-layers { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 2px 0; }
+.mini-layer {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 6px 12px; font-size: 0.88rem;
+}
+.quiet-layers { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.quiet-item {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline;
+  padding: 8px 12px; border-radius: 12px; font-size: 0.88rem;
+  color: var(--muted); border: 1px dashed var(--border);
+}
+.quiet-title { color: var(--text); font-weight: 500; }
+.quiet-detail { font-size: 0.8rem; }
+
+/* ===== מעברים ===== */
+.transition-card .tr-hero { display: flex; align-items: baseline; gap: 12px; }
+.tr-time { font-size: 1.7rem; font-weight: 700; color: var(--accent-heb); font-variant-numeric: tabular-nums; }
+.tr-label { font-size: 1.05rem; }
+.tr-list { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.tr-list li { display: flex; gap: 10px; font-size: 0.88rem; color: var(--muted); }
+.tr-t { font-variant-numeric: tabular-nums; min-width: 44px; }
+
+/* ===== בהמשך ===== */
+.upcoming ul { display: flex; flex-direction: column; }
+.upcoming li + li { border-top: 1px solid var(--border); }
+.up-row { display: flex; gap: 14px; padding: 9px 2px; align-items: baseline; }
+.up-row:hover { background: color-mix(in srgb, var(--border) 40%, transparent); }
+.up-dates { display: flex; flex-direction: column; min-width: 92px; }
+.up-heb { font-weight: 600; font-size: 0.92rem; color: var(--accent-heb); }
+.up-civil { font-size: 0.78rem; color: var(--muted); }
+.up-title { font-size: 0.95rem; font-weight: 500; }
+
+/* ===== תצוגת חודש ===== */
+.month-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.month-titles { text-align: center; }
+.month-titles h1 { font-size: 1.4rem; }
+.mt-heb { color: var(--accent-heb); }
+.month-sub { color: var(--muted); font-size: 0.9rem; }
+.nav-btn {
+  font-size: 1.5rem; padding: 2px 14px; border-radius: 12px; color: var(--muted);
+  border: 1px solid var(--border); background: var(--card); line-height: 1.4;
+}
+.nav-btn:hover { color: var(--text); }
+.month-toggle { display: flex; justify-content: center; gap: 6px; margin-bottom: 14px; }
+.tg {
+  padding: 5px 16px; border-radius: 999px; font-size: 0.88rem;
+  border: 1px solid var(--border); color: var(--muted); background: var(--card);
+}
+.tg.active { color: var(--text); font-weight: 600; border-color: var(--accent-heb); }
+
+.month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.wd { text-align: center; font-size: 0.75rem; color: var(--muted); padding-bottom: 4px; }
+.cell {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  min-height: 86px; padding: 5px 6px; display: flex; flex-direction: column; gap: 2px;
+  overflow: hidden;
+}
+.cell:hover { border-color: var(--muted); }
+.cell.dim { opacity: 0.42; }
+.cell.today { border: 2px solid var(--accent-heb); }
+.cell.shabbat-col { background: color-mix(in srgb, var(--k-shabbat) 6%, var(--card)); }
+.cell-nums { display: flex; justify-content: space-between; align-items: baseline; }
+.num-main { font-weight: 700; font-size: 1rem; }
+.num-main.heb { color: var(--accent-heb); }
+.num-sec { font-size: 0.72rem; color: var(--muted); }
+.num-sec.heb { color: var(--accent-heb); opacity: 0.85; }
+.cell-labels { display: flex; flex-direction: column; gap: 1px; }
+.cl { font-size: 0.66rem; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+.cl.more { color: var(--muted); }
+.cell-times { display: flex; flex-direction: column; font-size: 0.62rem; color: var(--muted); margin-top: auto; }
+.center { text-align: center; }
+
+/* ===== תצוגת יום ===== */
+.day-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.day-titles { text-align: center; }
+.day-titles h1 { font-size: 1.25rem; }
+.day-heb { font-size: 0.95rem; margin-top: 2px; }
+.eve-card { background: color-mix(in srgb, var(--accent-heb) 5%, var(--card)); }
+.eve-note { font-weight: 600; margin-bottom: 6px; color: var(--accent-heb); }
+.eve-layer { display: flex; gap: 8px; align-items: center; margin: 4px 0; flex-wrap: wrap; }
+.eve-time { margin-top: 8px; font-size: 0.92rem; }
+.zman-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 18px; }
+.zman-grid > div { display: flex; justify-content: space-between; font-size: 0.9rem; border-bottom: 1px dashed var(--border); padding-bottom: 4px; }
+.zman-grid span { color: var(--muted); }
+.zman-grid b { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* ===== עמוד מועד ===== */
+.back-link { color: var(--muted); font-size: 0.88rem; display: inline-block; margin-bottom: 10px; }
+.back-link:hover { color: var(--text); }
+.event-head {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 18px; box-shadow: var(--shadow); margin-bottom: 12px;
+}
+.event-head h1 { font-size: 1.7rem; margin: 8px 0 4px; }
+.event-instance { color: var(--muted); font-size: 0.92rem; margin-bottom: 8px; }
+.status-line { margin: 6px 0 0; font-size: 0.9rem; color: var(--muted); }
+.tldr-card .tldr { margin: 0; font-size: 1.02rem; }
+
+.tag {
+  display: inline-block; font-size: 0.68rem; font-weight: 700;
+  border-radius: 6px; padding: 1px 7px; margin-inline-end: 6px;
+  border: 1px solid;
+  vertical-align: middle;
+}
+.tag-din { color: var(--k-major-fast); border-color: color-mix(in srgb, var(--k-major-fast) 45%, transparent); }
+.tag-minhag { color: var(--k-rosh-chodesh); border-color: color-mix(in srgb, var(--k-rosh-chodesh) 45%, transparent); }
+.tag-hist { color: var(--k-parsha); border-color: color-mix(in srgb, var(--k-parsha) 45%, transparent); }
+.tag-state { color: var(--k-modern); border-color: color-mix(in srgb, var(--k-modern) 45%, transparent); }
+.tag-note { color: var(--muted); border-color: var(--border); }
+
+details { margin-bottom: 10px; }
+details > summary {
+  cursor: pointer; font-weight: 600; padding: 10px 14px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  list-style: none;
+}
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: '▸ '; color: var(--muted); }
+details[open] > summary::before { content: '▾ '; }
+details[open] > summary { border-radius: 12px 12px 0 0; }
+details > *:not(summary) { margin: 0; }
+.phase-sec > .blocks, .big-sec > .content-sub, .big-sec > .sources {
+  border: 1px solid var(--border); border-top: 0;
+  padding: 10px 16px; background: color-mix(in srgb, var(--card) 60%, var(--bg));
+}
+.big-sec > .content-sub:last-child, .phase-sec > .blocks, .big-sec > .sources { border-radius: 0 0 12px 12px; }
+.big-sec > .content-sub:not(:last-child) { border-radius: 0; }
+.phase-sec.now-phase > summary { border-color: var(--accent-heb); color: var(--accent-heb); }
+.content-sub h4 { margin: 8px 0 4px; font-size: 0.95rem; }
+.blocks li { margin: 7px 0; font-size: 0.94rem; }
+.sources li { margin: 5px 0; font-size: 0.9rem; }
+
+.timeline { display: flex; flex-direction: column; gap: 6px; }
+.timeline li { display: flex; gap: 12px; align-items: baseline; }
+.tl-time { min-width: 48px; font-weight: 700; color: var(--accent-heb); font-variant-numeric: tabular-nums; font-size: 0.92rem; }
+.tl-label { font-size: 0.95rem; }
+
+.coverage-note {
+  font-size: 0.85rem; color: var(--muted); border: 1px dashed var(--border);
+  border-radius: 10px; padding: 8px 12px; margin-top: 10px;
+}
+.disclaimer { font-size: 0.78rem; color: var(--muted); margin-top: 18px; text-align: center; }
+
+/* ===== חלונית הגדרות ===== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(10, 12, 18, 0.45); z-index: 50;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.modal {
+  background: var(--card); border-radius: 18px; padding: 22px; max-width: 380px; width: 100%;
+  display: flex; flex-direction: column; gap: 12px;
+  max-height: 90vh; overflow-y: auto;
+}
+.city-select {
+  font-family: inherit; font-size: 1rem; padding: 10px 12px;
+  border-radius: 10px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text);
+}
+.btn-primary, .btn-secondary {
+  font-family: inherit; font-size: 0.95rem; padding: 10px 14px; border-radius: 10px;
+  cursor: pointer; border: 1px solid var(--border);
+}
+.btn-primary { background: var(--accent-heb); color: #fff; border: none; font-weight: 600; }
+.btn-secondary { background: var(--bg); color: var(--text); }
+
+.modal-sep { border: 0; border-top: 1px solid var(--border); margin: 6px 0; width: 100%; }
+.ics-row { display: flex; gap: 8px; }
+.ics-url {
+  flex: 1; min-width: 0; font-family: inherit; font-size: 0.8rem;
+  padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text);
+}
+.ics-help { padding-inline-start: 4px; display: flex; flex-direction: column; gap: 4px; margin: 0; }
+
+.muted { color: var(--muted); }
+.small { font-size: 0.8rem; }
+.foot { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 30px; }
+
+.dual-date { display: inline-flex; gap: 6px; }
+.dd-heb { color: var(--accent-heb); }
+.dd-sep { color: var(--muted); }
+
+/* ===== מובייל ===== */
+@media (max-width: 560px) {
+  .hero-clock { font-size: 2.1rem; }
+  .cell { min-height: 68px; padding: 3px 4px; }
+  .cl { font-size: 0.58rem; }
+  .cell-times { font-size: 0.55rem; }
+  .num-main { font-size: 0.9rem; }
+  .brand-sub { display: none; }
+  .tab { padding: 5px 10px; font-size: 0.88rem; }
+  .zman-grid { grid-template-columns: 1fr 1fr; }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "רגע · זמן עברי ואזרחי",
+  "short_name": "רגע",
+  "description": "התמצאות בזמן עברי ואזרחי: מה עכשיו, מה חשוב עכשיו ומה המעבר הבא",
+  "dir": "rtl",
+  "lang": "he",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#141a26",
+  "theme_color": "#141a26",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
