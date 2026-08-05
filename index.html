@@ -25,7 +25,7 @@
         transition: opacity .45s ease;
       }
       #splash.hide { opacity: 0; pointer-events: none; }
-      #splash .mark { width: 132px; height: 132px; }
+      #splash .mark { width: 128px; height: 128px; border-radius: 28px; display: block; }
       #splash .name {
         font-size: 2.6rem; font-weight: 700; letter-spacing: .04em;
         color: #B4741C; margin-top: 18px; line-height: 1;
@@ -37,8 +37,8 @@
       }
       #splash .sig .rule { width: 34px; height: 1px; background: #C9BCA2; }
       #splash .sig .by {
-        font-size: .62rem; letter-spacing: .34em; text-transform: uppercase;
-        color: #A2947E; font-weight: 600;
+        font-size: 11px; letter-spacing: .36em; font-weight: 500;
+        color: #8A7C66; direction: ltr;
       }
       @media (prefers-color-scheme: dark) {
         #splash { background: #12161f; }
@@ -51,18 +51,17 @@
   <body>
     <div id="splash">
       <svg class="mark" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <line x1="120" y1="296" x2="392" y2="296" stroke="#C9A227" stroke-width="9" stroke-linecap="round" opacity="0.4"/>
-        <path d="M140 296 A116 116 0 0 1 372 296" fill="none" stroke="#E0A33C" stroke-width="21" stroke-linecap="round"/>
-        <circle cx="372" cy="296" r="31" fill="#D9822B"/>
-        <path d="M232 356 a54 54 0 1 0 64 64 44 44 0 1 1-64-64z" fill="#3E4B6B"/>
-        <circle cx="330" cy="376" r="10" fill="#3E4B6B"/>
-        <circle cx="196" cy="418" r="6.5" fill="#3E4B6B" opacity="0.7"/>
+        <rect width="512" height="512" rx="112" fill="#3E4B6B"/>
+        <path d="M256 0 H400 a112 112 0 0 1 112 112 V400 a112 112 0 0 1-112 112 H256 Z" fill="#FBF3E4"/>
+        <line x1="256" y1="0" x2="256" y2="512" stroke="#E0A33C" stroke-width="10"/>
+        <circle cx="352" cy="200" r="40" fill="#D9822B"/>
+        <path d="M136 296 a50 50 0 1 0 58 58 41 41 0 1 1-58-58z" fill="#FBF3E4"/>
       </svg>
       <div class="name">רגע</div>
       <div class="tag">זמן עברי ואזרחי</div>
       <div class="sig">
         <div class="rule"></div>
-        <div class="by">Alush Tech</div>
+        <div class="by">ALUSH&nbsp;STUDIO</div>
       </div>
     </div>
     <div id="root"></div>
