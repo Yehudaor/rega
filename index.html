@@ -3,10 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#141a26" />
+    <meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#12161f" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="רגע — התמצאות בזמן עברי ואזרחי: מה עכשיו, מה חשוב עכשיו ומה המעבר הבא" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="./icon-192.png" type="image/png" sizes="192x192" />
+    <!-- אייפון מתעלם מ־SVG לאייקון מסך הבית וזקוק ל־PNG -->
+    <link rel="apple-touch-icon" href="./icon-180.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="רגע" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>רגע · זמן עברי ואזרחי</title>
   </head>
   <body>
