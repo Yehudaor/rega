@@ -439,6 +439,36 @@ details > *:not(summary) { margin: 0; }
 .feed-card .city-select { width: 100%; }
 .connect-view .content-sub .city-select { margin-bottom: 10px; width: 100%; }
 
+/* ===== מצפן ===== */
+.compass-card { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.compass-card.aligned { border-color: var(--accent-heb); }
+.compass-wrap { position: relative; width: 100%; max-width: 300px; }
+.compass-pointer {
+  position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+  color: var(--accent-heb); font-size: 1rem; line-height: 1;
+}
+.compass-dial { width: 100%; display: block; }
+.compass-dial g { transition: transform .12s linear; }
+.dial-ring { fill: none; stroke: var(--border); stroke-width: 2; }
+.dial-ring-inner { fill: none; stroke: var(--border); stroke-width: 1; opacity: .6; }
+.tick { stroke: var(--muted); stroke-width: 1; opacity: .5; }
+.tick.major { stroke-width: 2; opacity: .8; }
+.rose-label {
+  fill: var(--muted); font-size: 13px; font-weight: 600;
+  text-anchor: middle; dominant-baseline: middle;
+}
+.rose-label.north { fill: var(--accent-civil); }
+.needle { stroke: var(--accent-heb); stroke-width: 4; stroke-linecap: round; }
+.needle-head { fill: var(--accent-heb); }
+.needle-hub { fill: var(--accent-heb); }
+.compass-readout { text-align: center; }
+.compass-deg { font-size: 2.1rem; font-weight: 700; color: var(--accent-heb); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.compass-word { font-size: 1rem; }
+.compass-dist, .compass-here { font-size: .88rem; color: var(--muted); margin-top: 2px; }
+.compass-here { font-size: 1.05rem; color: var(--accent-heb); font-weight: 600; }
+.compass-aligned { margin-top: 6px; font-size: .9rem; color: var(--accent-heb); font-weight: 600; }
+.compass-btn { width: 100%; max-width: 300px; }
+
 .muted { color: var(--muted); }
 .small { font-size: 0.8rem; }
 .foot { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 30px; }
@@ -455,6 +485,10 @@ details > *:not(summary) { margin: 0; }
   .cell-times { font-size: 0.55rem; }
   .num-main { font-size: 0.9rem; }
   .brand-sub { display: none; }
-  .tab { padding: 5px 10px; font-size: 0.88rem; }
+  .tab { padding: 5px 9px; font-size: 0.85rem; }
+  .tabs { margin-inline-start: 2px; gap: 1px; }
+  .topbar { gap: 6px; }
+  .city-btn { padding: 6px 9px; font-size: 0.8rem; }
+  .city-btn .city-name { display: none; }
   .zman-grid { grid-template-columns: 1fr 1fr; }
 }

@@ -9,6 +9,7 @@ import { DayView } from './ui/DayView';
 import { EventPage } from './ui/EventPage';
 import { ConnectView } from './ui/ConnectView';
 import { AboutView } from './ui/AboutView';
+import { CompassView } from './ui/CompassView';
 
 // מצב בדיקה: ?t=2026-07-22T21:00 מדמה זמן אחר (השעון ממשיך לרוץ מאותה נקודה)
 const timeOverride = (() => {
@@ -31,7 +32,8 @@ export type Route =
   | { view: 'day'; iso: string }
   | { view: 'event'; id: string; iso?: string }
   | { view: 'connect' }
-  | { view: 'about' };
+  | { view: 'about' }
+  | { view: 'compass' };
 
 function parseHash(): Route {
   const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
@@ -50,6 +52,7 @@ function parseHash(): Route {
   }
   if (parts[0] === 'connect') return { view: 'connect' };
   if (parts[0] === 'about') return { view: 'about' };
+  if (parts[0] === 'compass') return { view: 'compass' };
   if (parts[0] === 'day' && parts[1]) return { view: 'day', iso: parts[1] };
   if (parts[0] === 'event' && parts[1]) {
     return { view: 'event', id: decodeURIComponent(parts[1]), iso: parts[2] };
@@ -144,9 +147,10 @@ export function App() {
           <a className={isNow ? 'tab active' : 'tab'} href="#/">עכשיו</a>
           <a className={isMonth ? 'tab active' : 'tab'} href="#/month">חודש</a>
           <a className={route.view === 'connect' ? 'tab active' : 'tab'} href="#/connect">יומן</a>
+          <a className={route.view === 'compass' ? 'tab active' : 'tab'} href="#/compass">מצפן</a>
         </nav>
         <button className="city-btn" onClick={() => setSettingsOpen(true)} title="מיקום">
-          📍 {city.name}
+          📍 <span className="city-name">{city.name}</span>
         </button>
       </header>
 
@@ -159,6 +163,7 @@ export function App() {
         )}
         {route.view === 'connect' && <ConnectView city={city} />}
         {route.view === 'about' && <AboutView />}
+        {route.view === 'compass' && <CompassView city={city} />}
       </main>
 
       {settingsOpen && (
