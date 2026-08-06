@@ -440,8 +440,14 @@ details > *:not(summary) { margin: 0; }
 .connect-view .content-sub .city-select { margin-bottom: 10px; width: 100%; }
 
 /* ===== מצפן ===== */
-.compass-card { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.compass-card.aligned { border-color: var(--accent-heb); }
+.compass-card {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  transition: border-color .25s ease, background-color .25s ease;
+}
+.compass-card.aligned {
+  border-color: var(--k-omer);
+  background: color-mix(in srgb, var(--k-omer) 7%, var(--card));
+}
 .compass-wrap { position: relative; width: 100%; max-width: 300px; }
 .compass-pointer {
   position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
@@ -458,16 +464,25 @@ details > *:not(summary) { margin: 0; }
   text-anchor: middle; dominant-baseline: middle;
 }
 .rose-label.north { fill: var(--accent-civil); }
-.needle { stroke: var(--accent-heb); stroke-width: 4; stroke-linecap: round; }
-.needle-head { fill: var(--accent-heb); }
-.needle-hub { fill: var(--accent-heb); }
+.needle { stroke: var(--accent-heb); stroke-width: 7; stroke-linecap: round; transition: stroke .25s ease; }
+.needle-head { fill: var(--accent-heb); transition: fill .25s ease; }
+.needle-hub { fill: var(--accent-heb); transition: fill .25s ease; }
+.compass-card.aligned .needle { stroke: var(--k-omer); }
+.compass-card.aligned .needle-head,
+.compass-card.aligned .needle-hub { fill: var(--k-omer); }
+.compass-card.aligned .dial-ring { stroke: var(--k-omer); }
+.compass-card.aligned .compass-pointer { color: var(--k-omer); }
 .compass-readout { text-align: center; }
 .compass-deg { font-size: 2.1rem; font-weight: 700; color: var(--accent-heb); font-variant-numeric: tabular-nums; line-height: 1.1; }
 .compass-word { font-size: 1rem; }
 .compass-dist, .compass-here { font-size: .88rem; color: var(--muted); margin-top: 2px; }
 .compass-here { font-size: 1.05rem; color: var(--accent-heb); font-weight: 600; }
-.compass-aligned { margin-top: 6px; font-size: .9rem; color: var(--accent-heb); font-weight: 600; }
+.compass-ok {
+  font-size: 1.9rem; font-weight: 700; color: var(--k-omer); line-height: 1.2;
+}
 .compass-btn { width: 100%; max-width: 300px; }
+.compass-note { font-size: .82rem; color: var(--muted); text-align: center; margin: 0; }
+.dial-ring { transition: stroke .25s ease; }
 
 .muted { color: var(--muted); }
 .small { font-size: 0.8rem; }

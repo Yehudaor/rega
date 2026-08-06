@@ -16,20 +16,30 @@ const ROSE = [
   { deg: 270, label: 'מע' },
 ];
 
+/** היסטרזיס: נכנסים למצב "מכוון" ב־5°, יוצאים רק ב־12° — כדי שרעד קטן לא ירטיט שוב ושוב */
+const ALIGN_IN = 5;
+const ALIGN_OUT = 12;
+
+/** הפרש זוויתי מזערי ל־[-180,180] */
+function signedDelta(deg: number): number {
+  return ((deg % 360) + 540) % 360 - 180;
+}
+
 export function CompassView({ city }: { city: City }) {
   const [pos, setPos] = useState<Pos>({ lat: city.lat, lon: city.lon, source: 'city' });
   const [heading, setHeading] = useState<number | null>(null);
   const [sensorState, setSensorState] = useState<'idle' | 'on' | 'denied' | 'unsupported'>('idle');
   const [geoNote, setGeoNote] = useState<string | null>(null);
+  const [aligned, setAligned] = useState(false);
   const listening = useRef(false);
+  const alignedRef = useRef(false);
+  const headingRef = useRef<number | null>(null);
 
   const bearing = bearingTo(pos.lat, pos.lon);
   const distance = distanceTo(pos.lat, pos.lon);
-  // "אתם כאן" רק על סמך מיקום מדויק — קואורדינטת ירושלים היא בעצמה הר הבית
   const atTemple = pos.source === 'gps' && distance < 0.3;
   const tooCloseToTell = pos.source === 'city' && distance < 2;
 
-  // מיקום מדויק — משפר את הדיוק, אך יש ברירת מחדל לפי העיר שנבחרה
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
@@ -41,11 +51,16 @@ export function CompassView({ city }: { city: City }) {
 
   function onOrient(e: Event) {
     const ev = e as OrientEvent;
+    let h: number | null = null;
     if (typeof ev.webkitCompassHeading === 'number') {
-      setHeading(ev.webkitCompassHeading); // ספארי: כבר מעלות מהצפון
+      h = ev.webkitCompassHeading; // ספארי: כבר מעלות מהצפון
     } else if (ev.absolute && typeof ev.alpha === 'number') {
-      setHeading((360 - ev.alpha) % 360);
+      h = (360 - ev.alpha) % 360;
     }
+    // כיוון יחסי בלבד (בלי absolute) חסר משמעות כמצפן — מתעלמים
+    if (h === null) return;
+    headingRef.current = h;
+    setHeading(h);
   }
 
   async function enableCompass() {
@@ -57,8 +72,7 @@ export function CompassView({ city }: { city: City }) {
     // אייפון דורש בקשת הרשאה מפורשת, ורק מתוך לחיצה של המשתמש
     if (typeof DOE.requestPermission === 'function') {
       try {
-        const res = await DOE.requestPermission();
-        if (res !== 'granted') {
+        if ((await DOE.requestPermission()) !== 'granted') {
           setSensorState('denied');
           return;
         }
@@ -73,6 +87,10 @@ export function CompassView({ city }: { city: City }) {
       listening.current = true;
     }
     setSensorState('on');
+    // אם לא הגיע כיוון מוחלט תוך שלוש שניות — אין כאן מצפן אמיתי
+    setTimeout(() => {
+      if (headingRef.current === null) setSensorState('unsupported');
+    }, 3000);
   }
 
   useEffect(
@@ -84,32 +102,42 @@ export function CompassView({ city }: { city: City }) {
   );
 
   const live = sensorState === 'on' && heading !== null;
+  const offset = live ? signedDelta(bearing - heading!) : signedDelta(bearing);
+
+  // מעבר למצב "מכוון": רטט פעם אחת בכניסה, ולא בכל רעד
+  useEffect(() => {
+    if (!live || atTemple) return;
+    const off = Math.abs(offset);
+    if (!alignedRef.current && off <= ALIGN_IN) {
+      alignedRef.current = true;
+      setAligned(true);
+      navigator.vibrate?.(60);
+    } else if (alignedRef.current && off >= ALIGN_OUT) {
+      alignedRef.current = false;
+      setAligned(false);
+    }
+  }, [offset, live, atTemple]);
+
   const roseRot = live ? -heading! : 0;
-  const markerAngle = live ? bearing - heading! : bearing;
-  const aligned = live && Math.abs(((markerAngle + 540) % 360) - 180) > 172;
+  const showAligned = live && aligned;
 
   return (
     <div className="compass-view">
       <h1 className="connect-title">כיוון התפילה</h1>
-      <p className="connect-intro">
-        בתפילת העמידה מכוונים את הפנים לירושלים ואת הלב למקום המקדש וקודש הקודשים.
-        המצפן מראה את הכיוון מהמקום שבו אתם נמצאים.
-      </p>
 
-      <Card className={`compass-card ${aligned ? 'aligned' : ''}`}>
+      <Card className={`compass-card ${showAligned ? 'aligned' : ''}`}>
         <div className="compass-wrap">
           <div className="compass-pointer" aria-hidden="true">▼</div>
           <svg viewBox="0 0 240 240" className="compass-dial" role="img"
-               aria-label={`כיוון המקדש: ${Math.round(bearing)} מעלות`}>
+               aria-label={`כיוון מקום המקדש: ${Math.round(bearing)} מעלות`}>
             <g style={{ transform: `rotate(${roseRot}deg)`, transformOrigin: '120px 120px' }}>
               <circle cx="120" cy="120" r="108" className="dial-ring" />
-              <circle cx="120" cy="120" r="88" className="dial-ring-inner" />
               {Array.from({ length: 72 }, (_, i) => {
                 const major = i % 6 === 0;
                 return (
                   <line
                     key={i}
-                    x1="120" y1={major ? 16 : 20} x2="120" y2={major ? 28 : 25}
+                    x1="120" y1={major ? 15 : 19} x2="120" y2={major ? 27 : 24}
                     className={major ? 'tick major' : 'tick'}
                     style={{ transform: `rotate(${i * 5}deg)`, transformOrigin: '120px 120px' }}
                   />
@@ -117,19 +145,19 @@ export function CompassView({ city }: { city: City }) {
               })}
               {ROSE.map((r) => (
                 <text
-                  key={r.deg} x="120" y="46" className={`rose-label ${r.deg === 0 ? 'north' : ''}`}
+                  key={r.deg} x="120" y="45" className={`rose-label ${r.deg === 0 ? 'north' : ''}`}
                   style={{ transform: `rotate(${r.deg}deg)`, transformOrigin: '120px 120px' }}
                 >
                   {r.label}
                 </text>
               ))}
-              {/* חץ אל המקדש */}
+              {/* המחוג אל מקום המקדש */}
               <g style={{ transform: `rotate(${bearing}deg)`, transformOrigin: '120px 120px' }}>
-                <line x1="120" y1="120" x2="120" y2="52" className="needle" />
-                <polygon points="120,38 111,58 129,58" className="needle-head" />
-                <circle cx="120" cy="120" r="6" className="needle-hub" />
+                <line x1="120" y1="126" x2="120" y2="62" className="needle" />
+                <polygon points="120,36 105,68 135,68" className="needle-head" />
               </g>
             </g>
+            <circle cx="120" cy="120" r="9" className="needle-hub" />
           </svg>
         </div>
 
@@ -137,9 +165,9 @@ export function CompassView({ city }: { city: City }) {
           {atTemple ? (
             <div className="compass-here">אתם בסמוך למקום המקדש</div>
           ) : tooCloseToTell ? (
-            <div className="compass-here">
-              בחרתם ירושלים — אשרו מיקום מדויק כדי לקבל כיוון אמיתי
-            </div>
+            <div className="compass-here">בחרתם ירושלים — אשרו מיקום מדויק לכיוון אמיתי</div>
+          ) : showAligned ? (
+            <div className="compass-ok">אתה מכוון</div>
           ) : (
             <>
               <div className="compass-deg" dir="ltr">{Math.round(bearing)}°</div>
@@ -151,7 +179,6 @@ export function CompassView({ city }: { city: City }) {
               </div>
             </>
           )}
-          {aligned && <div className="compass-aligned">אתם פונים לכיוון הנכון</div>}
         </div>
 
         {sensorState !== 'on' && (
@@ -159,41 +186,32 @@ export function CompassView({ city }: { city: City }) {
             הפעלת המצפן החי
           </button>
         )}
+
+        <p className="compass-note">
+          הכיוון מחושב אל מקום המקדש בירושלים, מהמיקום שלכם.
+        </p>
+
         {sensorState === 'idle' && (
-          <p className="muted small center">
-            בלי הפעלה, החץ מוצג ביחס לצפון: סובבו את המכשיר עד שהאות צ׳ תפנה לצפון.
-          </p>
+          <p className="muted small center">בלי הפעלה, המחוג מוצג ביחס לצפון.</p>
         )}
         {sensorState === 'denied' && (
-          <p className="muted small center">ההרשאה לחיישן הכיוון נדחתה — החץ מוצג ביחס לצפון.</p>
+          <p className="muted small center">ההרשאה לחיישן הכיוון נדחתה — המחוג מוצג ביחס לצפון.</p>
         )}
         {sensorState === 'unsupported' && (
-          <p className="muted small center">
-            במכשיר או בדפדפן הזה אין חיישן כיוון. החץ מוצג ביחס לצפון.
-          </p>
+          <p className="muted small center">אין כאן חיישן מצפן — המחוג מוצג ביחס לצפון.</p>
         )}
         {geoNote && <p className="muted small center">{geoNote}</p>}
-        {pos.source === 'gps' && <p className="muted small center">הכיוון מחושב לפי המיקום המדויק שלכם.</p>}
       </Card>
 
-      <details className="big-sec" open>
+      <details className="big-sec">
         <summary>לאן בדיוק מכוונים</summary>
         <div className="content-sub">
           <ul className="blocks">
             <li><TagBadge tag="דין" /><span>העומד בחוץ לארץ מכוון פניו לארץ ישראל ולבו לירושלים, למקום המקדש ולקודש הקודשים.</span></li>
             <li><TagBadge tag="דין" /><span>העומד בארץ ישראל מכוון פניו לירושלים, ולבו למקום המקדש ולקודש הקודשים.</span></li>
             <li><TagBadge tag="דין" /><span>העומד בירושלים מכוון פניו למקום המקדש, ולבו לקודש הקודשים.</span></li>
-            <li><TagBadge tag="הערה" /><span>לכן היעד כאן הוא הר הבית — ולא מרכז העיר ירושלים.</span></li>
-          </ul>
-        </div>
-      </details>
-
-      <details className="big-sec">
-        <summary>עד כמה זה מדויק</summary>
-        <div className="content-sub">
-          <ul className="blocks">
-            <li><TagBadge tag="הערה" /><span>החישוב הוא אזימוט של מעגל גדול — הדרך הקצרה ביותר על פני כדור הארץ אל הר הבית.</span></li>
-            <li><TagBadge tag="בימינו" /><span>חיישן המצפן בטלפון מושפע ממתכת, ממכשירי חשמל ומכיסוי המכשיר, ועלול לסטות בכמה מעלות. יש לכייל אותו בתנועת שמינייה.</span></li>
+            <li><TagBadge tag="הערה" /><span>לכן היעד כאן הוא הר הבית ולא מרכז העיר, והזווית מחושבת מהמיקום המדויק שלכם — מנתניה, למשל, הכיוון הוא 149° ולא מזרח.</span></li>
+            <li><TagBadge tag="בימינו" /><span>חיישן המצפן מושפע ממתכת וממכשירי חשמל. אם המחוג קופץ — התרחקו ממקור ההפרעה וכיילו בתנועת שמינייה.</span></li>
             <li><TagBadge tag="הערה" /><span>אין צורך בדיוק של מעלות: ההלכה מדברת על כיוון כללי, ומי שאינו יודע לכוון — מכוון את לבו לאביו שבשמיים.</span></li>
           </ul>
         </div>
